@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Youtube Downloader</string>
+    <string name="video_title">title</string>
+    <string name="uploader_name">name</string>
+    <string name="video_duration">00:00</string>
+
 </resources>
