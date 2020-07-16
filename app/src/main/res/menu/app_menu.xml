@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:youtubedownloader="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/action_search"
+        android:title="@string/action_search"
+        android:icon="@drawable/ic_baseline_search_25"
+        youtubedownloader:showAsAction="ifRoom|collapseActionView"
+        youtubedownloader:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+    <item android:id="@+id/action_home"
+        android:title="@string/action_home"
+        android:icon="@drawable/ic_baseline_home_25"
+        youtubedownloader:showAsAction="always"/>
+
+</menu>

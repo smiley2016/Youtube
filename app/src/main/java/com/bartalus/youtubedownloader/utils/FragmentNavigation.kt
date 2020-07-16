@@ -15,13 +15,11 @@ import com.bartalus.youtubedownloader.views.SearchFragment
 
 class FragmentNavigation() {
     private val TAG = "FragmentNavigation"
-    private var mFragmentManager: FragmentManager? = null
     private var mMainActivityFragmentContainer: Int? = null
     private var mFragmentTransaction: FragmentTransaction? = null
 
-    constructor(context: Context) : this() {
+    init {
         mMainActivityFragmentContainer = R.id.fragment_holder
-        initAttributes(context)
     }
 
     private fun setFragmentArguments(fragment: Fragment, bundle: Bundle): Fragment {
@@ -29,22 +27,18 @@ class FragmentNavigation() {
         return fragment
     }
 
-    private fun initAttributes(context: Context) {
-        mFragmentManager = (context as MainActivity).supportFragmentManager
-    }
-
     fun getCurrentFragment(): Fragment? {
         return mFragmentManager!!.findFragmentById(mMainActivityFragmentContainer!!)
     }
 
-    private fun replaceFragment(fragment: Fragment, container: Int) {
+    private fun replaceFragment(fragment: Fragment, container: Int, addToBackstack: Boolean = true) {
         mFragmentTransaction = mFragmentManager!!.beginTransaction()
-
-        mFragmentTransaction!!.setReorderingAllowed(false)
 
         mFragmentTransaction!!.replace(container, fragment, fragment.tag)
 
-        mFragmentTransaction!!.addToBackStack(fragment::class.java.simpleName)
+        if(addToBackstack){
+            mFragmentTransaction!!.addToBackStack(fragment::class.java.simpleName)
+        }
 
         try {
             mFragmentTransaction!!.commit()
@@ -57,9 +51,9 @@ class FragmentNavigation() {
 
     }
 
-    fun showHomeFragment() {
+    fun showHomeFragment(addToBackstack: Boolean) {
         val currentFragment: Fragment = setFragmentArguments(HomeFragment(), Bundle())
-        replaceFragment(currentFragment, mMainActivityFragmentContainer!!)
+        replaceFragment(currentFragment, mMainActivityFragmentContainer!!, addToBackstack)
     }
 
     fun showLibraryFragment() {
@@ -79,12 +73,18 @@ class FragmentNavigation() {
 
     companion object {
         private var sInstance: FragmentNavigation? = null
+        private var mFragmentManager: FragmentManager? = null
 
         fun getInstance(context: Context): FragmentNavigation {
             if (sInstance == null) {
-                sInstance = FragmentNavigation(context)
+                sInstance = FragmentNavigation()
             }
+            initAttributes(context)
             return sInstance!!;
+        }
+
+        private fun initAttributes(context: Context) {
+            mFragmentManager = (context as MainActivity).supportFragmentManager
         }
     }
 }

@@ -5,61 +5,39 @@ import android.accounts.AccountManager
 import android.app.Activity
 import android.app.Dialog
 import android.app.ProgressDialog
-import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
-import android.os.AsyncTask
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.view.Window
-import android.widget.SearchView
 import android.widget.Toast
-import android.widget.Toolbar
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ActionProvider
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import com.bartalus.youtubedownloader.services.ApiController
 import com.bartalus.youtubedownloader.utils.AppUtility
 import com.bartalus.youtubedownloader.utils.AppUtility.Companion.mCredentials
 import com.bartalus.youtubedownloader.utils.FragmentNavigation
+import com.bartalus.youtubedownloader.views.HomeFragment
 import com.bartalus.youtubedownloader.views.SearchFragment
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.material.navigation.NavigationView
-import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
-import com.google.api.client.json.JsonFactory
-import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.client.util.ExponentialBackOff
-import com.google.api.services.youtube.YouTube
 import com.google.api.services.youtube.YouTubeScopes
-import com.google.api.services.youtube.model.Channel
-import com.google.api.services.youtube.model.SearchResult
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import io.reactivex.ObservableOnSubscribe
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.fragment_home.*
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
-import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 
@@ -77,7 +55,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, N
         const val REQUEST_GOOGLE_PLAY_SERVICES = 1002
         const val REQUEST_PERMISSION_GET_ACCOUNTS = 1003
     }
-    
+
     val PREF_ACCOUNT_NAME : String = "accountName"
     val SCOPES = arrayOf(YouTubeScopes.YOUTUBE_READONLY)
 
@@ -113,25 +91,39 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, N
     }
 
     private fun initEmitter() {
-        Observable.create(ObservableOnSubscribe<String> {
-                it -> textEmitter = it
+        Observable.create(ObservableOnSubscribe<String> { it ->
+            textEmitter = it
         })
-            .debounce (3000, TimeUnit.MILLISECONDS)
+            .debounce(2500, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                if(FragmentNavigation.getInstance(this).getCurrentFragment() !is SearchFragment){
+                mProgress!!.setMessage("Please wait!")
+                mProgress!!.show()
+
+                AppUtility.hideKeyboard(this, currentFocus!!)
+                if (FragmentNavigation.getInstance(this).getCurrentFragment() !is SearchFragment) {
                     val bundle = Bundle()
                     bundle.putString("QUERY_TEXT", it)
                     FragmentNavigation.getInstance(this).showSearchFragment(bundle)
-                }else{
-                    (FragmentNavigation.getInstance(this).getCurrentFragment() as SearchFragment).setQueryString(it)
+                } else {
+
+                    (FragmentNavigation.getInstance(this)
+                        .getCurrentFragment() as SearchFragment).setQueryString(it)
                 }
+                mProgress!!.dismiss()
 
             }
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
+        AppUtility.hideKeyboard(this, currentFocus!!)
+        if (query!!.length < 3) {
+            Toast.makeText(this, "Too short text!", Toast.LENGTH_LONG).show()
+            return false
+        }
+        mProgress!!.setMessage("Please wait!")
+        mProgress!!.show()
 
         return true
     }
@@ -139,7 +131,6 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, N
     override fun onQueryTextChange(newText: String?): Boolean {
         if(newText!!.length >= 3 ){
             textEmitter.onNext(newText)
-
         }
         return true
     }
@@ -165,11 +156,25 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, N
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.navigation_menu, menu)
-        val searchItem:MenuItem= menu!!.findItem(R.id.action_search)
-        val searchView: androidx.appcompat.widget.SearchView = MenuItemCompat.getActionView(searchItem) as androidx.appcompat.widget.SearchView
+        menuInflater.inflate(R.menu.app_menu, menu)
+        val searchItem: MenuItem = menu!!.findItem(R.id.action_search)
+        val searchView: androidx.appcompat.widget.SearchView =
+            MenuItemCompat.getActionView(searchItem) as androidx.appcompat.widget.SearchView
 
         searchView.setOnQueryTextListener(this)
+
+        val homeItem: MenuItem = menu.findItem(R.id.action_home)
+
+        homeItem.setOnMenuItemClickListener {
+            if (FragmentNavigation.getInstance(this).getCurrentFragment() !is HomeFragment) {
+                FragmentNavigation.getInstance(this).showHomeFragment(true)
+            }
+            Log.d(TAG,
+                "onCreateOptionsMenu: homeButton clicked ${FragmentNavigation.getInstance(this)
+                    .getCurrentFragment()}"
+            )
+            return@setOnMenuItemClickListener true
+        }
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -201,9 +206,8 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, N
         }else if( ! isDeviceOnline()){
             Toast.makeText(this, "No network available.", Toast.LENGTH_SHORT).show()
         }else{
-            mProgress!!.hide()
-            FragmentNavigation.getInstance(this).showHomeFragment()
-
+            mProgress!!.dismiss()
+            FragmentNavigation.getInstance(this).showHomeFragment(false)
         }
     }
 
