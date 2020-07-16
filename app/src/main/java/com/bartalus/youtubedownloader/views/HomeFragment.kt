@@ -10,6 +10,7 @@ import butterknife.ButterKnife
 import com.bartalus.youtubedownloader.R
 import com.bartalus.youtubedownloader.adapters.HomeRecyclerViewAdapter
 import com.bartalus.youtubedownloader.services.ApiController
+import com.google.api.services.youtube.model.SearchResult
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -18,20 +19,6 @@ import kotlinx.android.synthetic.main.fragment_home.*
 class HomeFragment : BaseFragment() {
     private val TAG = HomeFragment::class.java.simpleName
     lateinit var mHomeAdapter: HomeRecyclerViewAdapter
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        Single.fromCallable {
-            ApiController.getInstance().getStartPageVideos()
-        }.subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess {
-                mHomeAdapter.setList(it)
-            }
-            .subscribe()
-    }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,6 +46,30 @@ class HomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecyclerView()
+
+        val list = ArrayList<SearchResult>()
+
+        list.add(SearchResult())
+        list.add(SearchResult())
+        list.add(SearchResult())
+        list.add(SearchResult())
+        list.add(SearchResult())
+
+
+        mHomeAdapter.addToVideoList(list)
+
+        //fetchVideosData()
+    }
+
+    private fun fetchVideosData() {
+        Single.fromCallable {
+            ApiController.getInstance().getStartPageVideos()
+        }.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSuccess {
+                mHomeAdapter.addToVideoList(it)
+            }
+            .subscribe()
     }
 
 

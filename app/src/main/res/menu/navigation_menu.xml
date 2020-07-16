@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:youtubedownloader="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/action_search"
+        android:title="@string/action_search"
+        android:icon="@drawable/ic_baseline_search_25"
+        youtubedownloader:showAsAction="ifRoom|collapseActionView"
+        youtubedownloader:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+    <group>
+        <item
+            android:id="@+id/nav_library"
+            android:icon="@drawable/ic_baseline_library_music_25"
+            android:title="@string/library" />
+        <item
+            android:id="@+id/nav_history"
+            android:icon="@drawable/ic_baseline_history_25"
+            android:title="@string/history" />
+    </group>
+
+
+
+</menu>

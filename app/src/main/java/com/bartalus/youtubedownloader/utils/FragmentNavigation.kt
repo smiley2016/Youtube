@@ -8,7 +8,10 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.bartalus.youtubedownloader.MainActivity
 import com.bartalus.youtubedownloader.R
+import com.bartalus.youtubedownloader.views.HistoryFragment
 import com.bartalus.youtubedownloader.views.HomeFragment
+import com.bartalus.youtubedownloader.views.LibraryFragment
+import com.bartalus.youtubedownloader.views.SearchFragment
 
 class FragmentNavigation() {
     private val TAG = "FragmentNavigation"
@@ -21,12 +24,12 @@ class FragmentNavigation() {
         initAttributes(context)
     }
 
-    fun setFragmentArguments(fragment: Fragment, bundle: Bundle): Fragment {
+    private fun setFragmentArguments(fragment: Fragment, bundle: Bundle): Fragment {
         fragment.arguments = bundle
         return fragment
     }
 
-    fun initAttributes(context: Context) {
+    private fun initAttributes(context: Context) {
         mFragmentManager = (context as MainActivity).supportFragmentManager
     }
 
@@ -34,7 +37,7 @@ class FragmentNavigation() {
         return mFragmentManager!!.findFragmentById(mMainActivityFragmentContainer!!)
     }
 
-    fun replaceFragment(fragment: Fragment, container: Int) {
+    private fun replaceFragment(fragment: Fragment, container: Int) {
         mFragmentTransaction = mFragmentManager!!.beginTransaction()
 
         mFragmentTransaction!!.setReorderingAllowed(false)
@@ -46,7 +49,7 @@ class FragmentNavigation() {
         try {
             mFragmentTransaction!!.commit()
 
-            Log.d(TAG, "Fragment replaced and committed!")
+            Log.d(TAG, "Fragment ${fragment::class.java.simpleName} replaced and committed!")
         } catch (ex: Exception) {
             ex.printStackTrace()
             ex.message
@@ -56,6 +59,21 @@ class FragmentNavigation() {
 
     fun showHomeFragment() {
         val currentFragment: Fragment = setFragmentArguments(HomeFragment(), Bundle())
+        replaceFragment(currentFragment, mMainActivityFragmentContainer!!)
+    }
+
+    fun showLibraryFragment() {
+        val currentFragment: Fragment = setFragmentArguments(LibraryFragment(), Bundle())
+        replaceFragment(currentFragment, mMainActivityFragmentContainer!!)
+    }
+
+    fun showHistoryFragment(){
+        val currentFragment: Fragment = setFragmentArguments(HistoryFragment(), Bundle())
+        replaceFragment(currentFragment, mMainActivityFragmentContainer!!)
+    }
+
+    fun showSearchFragment(bundle: Bundle){
+        val currentFragment: Fragment = setFragmentArguments(SearchFragment(), bundle)
         replaceFragment(currentFragment, mMainActivityFragmentContainer!!)
     }
 

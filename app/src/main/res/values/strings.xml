@@ -3,5 +3,13 @@
     <string name="video_title">title</string>
     <string name="uploader_name">name</string>
     <string name="video_duration">00:00</string>
+    <string name="playlists">Playlists</string>
+    <string name="library">Library</string>
+    <string name="history">History</string>
+    <string name="user">User</string>
+    <string name="email">Email</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="action_search">Search</string>
 
 </resources>
