@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/item_background_color"
+    android:layout_marginTop="4dp"
+    android:id="@+id/library_item"
+    >
+
+    <ImageView
+        android:id="@+id/library_item_thumbnail"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:src="@drawable/ic_baseline_library_music_25"
+        />
+
+    <TextView
+        android:id="@+id/library_item_title"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_color"
+        android:textSize="16sp"
+        android:text="@string/video_title"
+        android:layout_margin="16dp"
+        android:layout_toEndOf="@id/library_item_thumbnail"
+        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@id/library_item_thumbnail"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:ellipsize="end"
+        android:lines="1"
+        />
+
+    <TextView
+        android:id="@+id/library_item_duration"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="@color/text_color"
+        android:text="@string/video_title"
+        android:layout_margin="16dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@id/library_item_thumbnail"
+        android:gravity="center_vertical|end"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:lines="1"
+        />
+
+
+
+</RelativeLayout>
