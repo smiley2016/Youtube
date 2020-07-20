@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.AssetFileDescriptor
 import android.media.MediaPlayer
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.bartalus.youtubedownloader.R
 import com.bartalus.youtubedownloader.models.Song
+import com.bartalus.youtubedownloader.utils.FragmentNavigation
 import com.bumptech.glide.Glide
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.library_popup_dialog.*
@@ -72,74 +74,11 @@ class LibraryRecyclerViewAdapter : RecyclerView.Adapter<LibraryRecyclerViewAdapt
             libraryItemDuration.text = durationBuilder(song.duration!!)
 
             libraryItem.setOnClickListener{
-                val dialog: Dialog = Dialog(context)
-                dialog.setContentView(R.layout.library_popup_dialog)
-
-                val playButton = dialog.dialog_playButton
-                val seekBar = dialog.dialog_seekbar
-
-                seekBar.progress = 0
-                seekBar.max = 100
-
-                dialog.show()
-
-                val mediaPlayer = MediaPlayer()
-
-                mediaPlayer.setDataSource(song.data)
-
-
-                mediaPlayer.prepare()
-                mediaPlayer.setVolume(1f,1f)
-                mediaPlayer.isLooping = true
-                mediaPlayer.start()
-
-                val mediaFileLengthInMillis = mediaPlayer.duration
-
-                playButton.setOnClickListener{
-
-                    if(mediaPlayer.isPlaying){
-                        Glide.with(context).load(R.drawable.ic_baseline_play_arrow_25).into(playButton)
-
-                        (context as Activity).getPreferences(Context.MODE_PRIVATE)
-                            .edit()
-                            .putInt("SEEK_TO", mediaPlayer.currentPosition)
-                            .apply()
-
-                        mediaPlayer.stop()
-                    }else{
-                        Glide.with(context).load(R.drawable.ic_baseline_pause_25).into(playButton)
-
-                        val seekTo = (context as Activity).getPreferences(Context.MODE_PRIVATE).getInt("SEEK_TO",0)
-
-                        mediaPlayer.prepare()
-                        mediaPlayer.seekTo(seekTo)
-                        mediaPlayer.start()
-                    }
-
-
-
-                }
-
-                dialog.setOnDismissListener{
-                    mediaPlayer.stop()
-                    mediaPlayer.release()
-                }
-
-                seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
-                    override fun onProgressChanged(seekbar: SeekBar?, p1: Int, p2: Boolean) {
-                        if(p2){
-                            seekBar.setProgress(p1, true)
-                        }
-                    }
-
-                    override fun onStartTrackingTouch(p0: SeekBar?) {
-
-                    }
-
-                    override fun onStopTrackingTouch(p0: SeekBar?) {
-
-                    }
-                })
+                val bundle = Bundle()
+                bundle.putString("SONG_PATH", song.data)
+                bundle.putString("SONG_TITLE", song.title)
+                bundle.putString("SONG_ARTIST", song.artist)
+                FragmentNavigation.getInstance(context).showMediaPlayerDialog(bundle)
             }
 
         }

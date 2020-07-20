@@ -27,7 +27,8 @@ import java.lang.Exception
 
 class LibraryFragment: BaseFragment() {
 
-    lateinit var mLibraryRecyclerViewAdapter:LibraryRecyclerViewAdapter
+    private lateinit var mLibraryRecyclerViewAdapter:LibraryRecyclerViewAdapter
+    private lateinit var cursor: Cursor
 
     companion object{
         const val READ_FROM_EXTERNAL_STORAGE_PERMISSION = 1
@@ -68,12 +69,13 @@ class LibraryFragment: BaseFragment() {
             MediaStore.Audio.Media.TITLE,
             MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media.DISPLAY_NAME,
-            MediaStore.Audio.Media.DURATION
+            MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media.ARTIST
         )
 
         val contentResolver = (context as MainActivity).contentResolver
 
-        val cursor = (this.context as Activity).managedQuery(
+        cursor = (this.context as Activity).managedQuery(
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
             projection,
             selection,
@@ -90,10 +92,10 @@ class LibraryFragment: BaseFragment() {
                     cursor.getString(1),
                     cursor.getString(2),
                     cursor.getString(3),
-                    cursor.getString(4))
+                    cursor.getString(4),
+                    cursor.getString(5))
                 )
             }
-            cursor.close()
 
             mLibraryRecyclerViewAdapter.addToList(songs)
 
@@ -129,6 +131,11 @@ class LibraryFragment: BaseFragment() {
                 Toast.makeText(this.context, "You have to grant read permission to list your music!", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    override fun onDestroy() {
+        cursor.close()
+        super.onDestroy()
     }
 
 }
