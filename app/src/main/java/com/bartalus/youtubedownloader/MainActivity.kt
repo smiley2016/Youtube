@@ -22,6 +22,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.bartalus.youtubedownloader.utils.AppUtility
 import com.bartalus.youtubedownloader.utils.AppUtility.Companion.mCredentials
 import com.bartalus.youtubedownloader.utils.FragmentNavigation
+import com.bartalus.youtubedownloader.utils.SQLiteLocalDatabase
 import com.bartalus.youtubedownloader.views.HomeFragment
 import com.bartalus.youtubedownloader.views.SearchFragment
 import com.google.android.gms.common.ConnectionResult
